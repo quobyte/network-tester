@@ -1,0 +1,3 @@
+---
+traffic_data_dir: /var/tmp/netdiag_data
+local_traffic_data_dir: /tmp/quobyte_netdiag_data

@@ -1,0 +1,19 @@
+#
+# netdiag_clients and netdiag_servers 
+# must be populated accordingly
+#
+
+[netdiag_hosts:children]
+netdiag_clients
+netdiag_servers
+
+[netdiag_clients]
+# hostname_or_ip_1
+# hostname_or_ip_2
+# ...
+
+[netdiag_servers]
+# hostname_or_ip_3
+# hostname_or_ip_4
+# ...
+

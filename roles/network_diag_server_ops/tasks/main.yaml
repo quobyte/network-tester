@@ -1,0 +1,27 @@
+---
+- name: Get running processes
+  shell: "ps -eo pid,cmd|grep '[n]etserver'|awk '{print $1}'"
+  register: running_processes
+
+- name: Kill running processes
+  shell: "kill {{ item }}"
+  become: True
+  with_items: "{{ running_processes.stdout_lines }}"
+
+- wait_for:
+    path: "/proc/{{ item }}/status"
+    state: absent
+    timeout: 30
+  with_items: "{{ running_processes.stdout_lines }}"
+  ignore_errors: yes
+  register: killed_processes
+
+- name: Force kill stuck processes
+  shell: "kill -9 {{ item }}"
+  with_items: "{{ killed_processes.results | select('failed') | map(attribute='item') | list }}"
+  become: True
+
+- name: Launch a new instance of netserver
+  shell: "ulimit -n $(sysctl fs.nr_open| cut -d ' ' -f 3); netserver"
+  become: True
+  when: server_op == "start"

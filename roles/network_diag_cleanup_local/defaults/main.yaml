@@ -1,0 +1,4 @@
+---
+local_traffic_data_dir: /tmp/quobyte_netdiag_data
+pristine_local_traffic_data_dir: False
+

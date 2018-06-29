@@ -1,0 +1,77 @@
+---
+- name: Remove any obsolete data
+  file: path="{{ traffic_data_dir }}/{{ test_group_label }}-stats" state=absent
+  become: True
+  when: stat_phase is not defined or stat_phase == "before"
+
+- name: Ensure report directory exists
+  file: path="{{ traffic_data_dir }}/{{ test_group_label }}-stats" state=directory
+
+- name: Gather statistics before the test
+  shell: |
+    uname -a &> uname.log
+    lspci -vvv &> lspci.log
+    sysctl -a &> sysctl.log
+    dmesg &> dmesg.before.log
+    ip r s t 0 &> route.tables.log
+    ip ru s &> route.policies.log
+    ip a s &> link.statuses.log
+    cat /proc/interrupts &> interrupts.before.log
+    cat /proc/softirqs &> softirqs.before.log
+    cat /proc/net/softnet_stat &> softnet.before.log
+    netstat -s &> netstat.before.log
+
+    for netdev in $(ls -1d /sys/class/net/*); do
+      ethtool -k ${netdev##*/} &> net.features.${netdev##*/}.log
+      ethtool -c ${netdev##*/} &> net.coalesce.${netdev##*/}.log
+      ethtool -g ${netdev##*/} &> net.rings.${netdev##*/}.log
+      ethtool -l ${netdev##*/} &> net.channels.${netdev##*/}.log
+      ethtool -x ${netdev##*/} &> net.rss.${netdev##*/}.log
+      ethtool -n ${netdev##*/} &> net.nflow.${netdev##*/}.log
+      ethtool -a ${netdev##*/} &> net.efc.${netdev##*/}.log
+      ethtool ${netdev##*/} &> net.basic.${netdev##*/}.log
+      ethtool -S ${netdev##*/} &> net.stats.${netdev##*/}.before.log
+    done
+    ip tc &> tcp.metrics.before.log
+    ip ne &> arp.before.log
+    exit 0
+  args:
+    chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    executable: /usr/bin/bash
+  become: True
+  when: stat_phase is not defined or stat_phase == "before"
+
+- name: Gather statistics after the test
+  shell: |
+
+    dmesg &> dmesg.after.log
+    cat /proc/interrupts &> interrupts.after.log
+    cat /proc/softirqs &> softirqs.after.log
+    cat /proc/net/softnet_stat &> softnet.after.log
+    netstat -s &> netstat.after.log
+
+    for netdev in $(ls -1d /sys/class/net/*); do
+      ethtool -S ${netdev##*/} &> net.stats.${netdev##*/}.after.log
+    done
+    ip tc &> tcp.metrics.after.log
+    ip ne &> arp.after.log
+    exit 0
+  args:
+    chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    executable: /usr/bin/bash
+  become: True
+  when: stat_phase is defined and stat_phase == "after"
+
+- name: Create report archive
+  archive:
+    path: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    dest: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ ansible_date_time.epoch }}-{{ inventory_hostname }}.tar.gz"
+  become: True
+  when: stat_phase is not defined or stat_phase == "after"
+
+- name: Remove temporary data
+  file:
+    path: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    state: absent
+  become: True
+  when: stat_phase is not defined or stat_phase == "after"

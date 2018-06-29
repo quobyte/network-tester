@@ -1,0 +1,8 @@
+---
+# No of TCP connections every clients opens to each server for upload traffic
+upload_streams: 4
+# No of TCP connections every clients opens to each server for download traffic
+download_streams: 4
+# Single subtest duration 
+duration: 90
+

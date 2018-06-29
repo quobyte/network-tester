@@ -1,0 +1,23 @@
+---
+- block:
+    - name: Install additional packages
+      yum: name="{{ packages_to_install }}" state=latest
+      become: True
+
+    - name: Copy netperf package
+      copy: src="{{ netperf_package }}" dest=/tmp
+
+    - name: Install netperf package
+      yum:
+        name: "/tmp/{{ netperf_package }}"
+        state: present
+      become: True
+  when: netperf_install
+
+- name: Remove netperf package
+  file: path="/tmp/{{ netperf_package }}" state=absent
+
+- name: Install python packages in virtualenv
+  pip: name={{ item }} virtualenv={{ netdiag_venv }}
+  with_items:
+    - flent

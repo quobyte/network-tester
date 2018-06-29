@@ -1,0 +1,17 @@
+---
+#
+# behavioral inventory parameters (optional)
+#
+#ansible_user: quobyte
+#ansible_ssh_pass: your_pass
+#ansible_ssh_private_key_file: path 
+#ansible_ssh_common_args: some_ssh_opts
+
+# If you want to provide your own netperf binary set to False
+netperf_install: True
+
+# Path on an ansible host where test data fetched from clients and servers is stored
+local_traffic_data_dir: /tmp/quobyte_netdiag_data
+
+# Whether to wipe out local_data_dir before new test data is downloaded
+pristine_local_traffic_data_dir: False

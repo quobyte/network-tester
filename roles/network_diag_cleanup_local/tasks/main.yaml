@@ -1,0 +1,12 @@
+---
+- block:
+
+  - name: Remove local data directory
+    file: path="{{ local_traffic_data_dir }}" state=absent
+    when: pristine_local_traffic_data_dir
+
+  - name: Create local data directory
+    file: path="{{ local_traffic_data_dir }}" state=directory
+
+  delegate_to: localhost
+  run_once: True

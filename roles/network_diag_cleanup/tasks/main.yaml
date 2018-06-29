@@ -1,0 +1,12 @@
+---
+- name: Remove venv and data dir
+  file: path="{{ item }}" state=absent
+  with_items:
+    - "{{ netdiag_venv }}"
+    - "{{ traffic_data_dir }}"
+  become: True
+
+- name: Uninstall netperf
+  yum: name="netperf" state=absent
+  when: netperf_install|default(True)
+  become: True

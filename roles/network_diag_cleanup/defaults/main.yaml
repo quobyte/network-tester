@@ -1,0 +1,2 @@
+traffic_data_dir: /var/tmp/netdiag_data
+netdiag_venv: /var/tmp/netdiag_venv

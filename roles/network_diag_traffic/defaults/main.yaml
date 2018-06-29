@@ -1,0 +1,11 @@
+---
+traffic_data_dir: /var/tmp/netdiag_data
+netdiag_venv: /var/tmp/netdiag_venv
+pristine_traffic_data_dir: True
+upload_streams: 4
+download_streams: 4
+socket_stats: True
+duration: 70
+test_conf_src: rrul_be_nflows_multihost.conf
+test_conf_name: rrul_be_nflows_multihost
+test_group_label: all

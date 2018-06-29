@@ -1,0 +1,189 @@
+---
+- name: Gather facts from all hosts
+  hosts: netdiag_hosts
+  tasks:
+    - ping:
+  tags:
+    - install
+    - test
+    - cleanup
+
+- name: Install network test tools
+  hosts: netdiag_hosts
+  gather_facts: no
+  roles:
+    - network_diag_install
+  tags:
+    - install
+
+- name: Launch netperf servers
+  hosts: netdiag_servers
+  gather_facts: no
+  roles:
+    - network_diag_cleanup_local
+    - network_diag_server_ops
+  tags:
+    - test
+
+- name: Select one client host
+  hosts: netdiag_hosts
+  gather_facts: no
+  tasks:
+    - add_host:
+        name: "{{ item }}"
+        groups: single_client
+      with_random_choice: "{{ groups['netdiag_clients'] }}"
+      when: "'single_client' not in groups"
+  tags:
+    - test
+
+- name: Select one server host
+  hosts: netdiag_hosts
+  gather_facts: no
+  tasks:
+    - add_host:
+        name: "{{ item }}"
+        groups: single_server
+      with_random_choice: "{{ groups['netdiag_servers'] }}"
+      when: "'single_server' not in groups"
+  tags:
+    - test
+
+- name: Kernel statistics (before)
+  gather_facts: no
+  hosts: [single_client, netdiag_servers]
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    test_group_label: single_client
+    stat_phase: before
+  tags:
+    - test
+
+- name: Launch netperf traffic on a single host
+  gather_facts: no
+  hosts: single_client
+  roles:
+    - network_diag_traffic
+  vars:
+    test_group_label: single_client
+    server_targets: "{{ groups['netdiag_servers'] }}"
+  tags:
+    - test
+
+- name: Kernel statistics (after)
+  gather_facts: no
+  hosts: [single_client, netdiag_servers]
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    test_group_label: single_client
+    stat_phase: after
+  tags:
+    - test
+
+- name: Download test raw data
+  gather_facts: no
+  hosts: [single_client, netdiag_servers]
+  roles:
+    - network_diag_download_data
+  tags:
+    - test
+
+- name: Kernel statistics (before)
+  gather_facts: no
+  hosts: [single_server, netdiag_clients]
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    test_group_label: single_server
+    stat_phase: before
+  tags:
+    - test
+
+- name: Launch netperf traffic against a single server
+  gather_facts: no
+  hosts: netdiag_clients
+  roles:
+    - network_diag_traffic
+  vars:
+    test_group_label: single_server
+    server_targets: "{{ groups['single_server'] }}"
+  tags:
+    - test
+
+- name: Kernel statistics (after)
+  gather_facts: no
+  hosts: [single_server, netdiag_clients]
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    test_group_label: single_server
+    stat_phase: after
+  tags:
+    - test
+
+- name: Download test raw data
+  gather_facts: no
+  hosts: [single_server, netdiag_clients]
+  roles:
+    - network_diag_download_data
+  tags:
+    - test
+
+- name: Kernel statistics (before)
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    stat_phase: before
+  tags:
+    - test
+
+- name: Launch netperf traffic on all hosts
+  gather_facts: no
+  hosts: netdiag_clients
+  roles:
+    - network_diag_traffic
+  vars:
+    server_targets: "{{ groups['netdiag_servers'] }}"
+  tags:
+    - test
+
+- name: Kernel statistics (after)
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    stat_phase: after
+  tags:
+    - test
+
+- name: Download test raw data
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_download_data
+  tags:
+    - test
+
+- name: Stop netperf servers
+  gather_facts: no
+  hosts: netdiag_servers
+  roles:
+    - network_diag_server_ops
+  vars:
+    server_op: stop
+  tags:
+    - cleanup
+
+- name: Remove data and software
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_cleanup
+  tags:
+    - cleanup
+
