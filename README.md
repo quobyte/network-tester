@@ -15,7 +15,7 @@ To verify configuration is correct run the following:
 $ ansible -i inventory_file -m ping -b all
 ```
 
-No errors must be reported.
+The command must produce no errors.
 
 The playbook includes a Netperf RPM package for RHEL/CentOS 7.x for your convenience. If you would like to provide your own binaries, bear in mind *--enable-demo* option must be supported by Netperf. In that case set `netperf_install: False`.
 
