@@ -1,0 +1,3 @@
+---
+local_traffic_data_dir: /tmp/quobyte_netdiag_data
+qbnettest_params: ""

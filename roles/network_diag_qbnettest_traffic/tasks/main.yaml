@@ -1,0 +1,42 @@
+---
+- block:
+    - name: Check if python3 is available
+      shell: "python3 --version"
+      register: python3_in_path
+      ignore_errors: True
+
+    - block:
+        - name: Create temporary config file 
+          tempfile:
+            state: file
+            suffix: ".qbnettest.host.conf"
+          register: qbnettestconf_file
+
+        - name: Populate config file
+          template: src=qbnettest.conf.j2 dest="{{ qbnettestconf_file.path }}"
+
+        - name: Set remote login
+          set_fact:
+            qbnettest_params: "{{ qbnettest_params }} -u {{ ansible_user }}"
+          when: ansible_user is defined
+
+        - name: Set ssh identity
+          set_fact:
+            qbnettest_params: "{{ qbnettest_params }} -i {{ ansible_ssh_private_key_file }}"
+          when: ansible_ssh_private_key_file is defined
+
+        - name: Make sure the output dir exists
+          file: path="{{ local_traffic_data_dir }}" state=directory
+
+        - name: Run iperf/ping tests
+          shell: "python3 {{ role_path }}/files/qbnettest.py -H {{ qbnettestconf_file.path }} {{ qbnettest_params }}"
+          args:
+            chdir: "{{ local_traffic_data_dir }}"
+
+        - name: Remove temporary config files
+          file: path="{{ qbnettestconf_file.path }}" state=absent
+
+      when: python3_in_path.rc == 0
+
+  run_once: True
+  delegate_to: localhost

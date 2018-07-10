@@ -169,6 +169,14 @@
   tags:
     - test
 
+- name: Launch qbnettest
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_qbnettest_traffic
+  tags:
+    - test
+
 - name: Stop netperf servers
   gather_facts: no
   hosts: netdiag_servers
