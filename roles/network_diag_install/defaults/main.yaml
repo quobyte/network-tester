@@ -4,6 +4,8 @@ packages_to_install:
   - iproute
   - iperf
   - ethtool
+  - pciutils
+  - procps-ng
 
 netperf_package: netperf-2.7.0-1.el7.x86_64.rpm
 netdiag_venv: /var/tmp/netdiag_venv
