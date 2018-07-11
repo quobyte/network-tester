@@ -31,6 +31,9 @@
       ethtool -a ${netdev##*/} &> net.efc.${netdev##*/}.log
       ethtool ${netdev##*/} &> net.basic.${netdev##*/}.log
       ethtool -S ${netdev##*/} &> net.stats.${netdev##*/}.before.log
+      tc q s dev ${netdev##*/} &> tc.q.${netdev##*/}.log
+      tc c s dev ${netdev##*/} &> tc.c.${netdev##*/}.log
+      tc f s dev ${netdev##*/} &> tc.f.${netdev##*/}.log
     done
     ip tc &> tcp.metrics.before.log
     ip ne &> arp.before.log
