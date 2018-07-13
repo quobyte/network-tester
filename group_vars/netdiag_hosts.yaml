@@ -15,3 +15,7 @@ local_traffic_data_dir: /tmp/quobyte_netdiag_data
 
 # Whether to wipe out local_data_dir before new test data is downloaded
 pristine_local_traffic_data_dir: False
+
+# this prefix will be removed from inventory hostname when passing data to flent
+# useful when you've got different names for management and production interfaces
+host_prefix: ""

@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+
+export PATH="$PATH:/usr/sbin"
+ulimit -n {{ open_files_limit }}
+
+[ $? -ne 0 ] && echo "Open files limit update failed" && exit 1
+sleep 15
+{% if item == "duplex" %}
+{{ netdiag_venv }}/bin/flent {{ test_conf_name }} -l {{ duration }} \
+-H {{ server_targets|join(' -H ')|replace(host_prefix,'') }} \
+{{ '--socket-stats' if socket_stats else '' }} \
+--test-parameter upload_streams={{ upload_streams }} \
+--test-parameter download_streams={{ download_streams }} \
+-D {{ traffic_data_dir }}/flent -t 'duplex {{ test_group_label }} {{ inventory_hostname }}'
+
+[ $? -ne 0 ] && echo "Duplex test failed failed" && exit 2
+{% elif item == "upload" %}
+{{ netdiag_venv }}/bin/flent {{ test_conf_name }} -l {{ duration }} \
+-H {{ server_targets|join(' -H ')|replace(host_prefix,'') }} \
+{{ '--socket-stats' if socket_stats else '' }} \
+--test-parameter upload_streams={{ upload_streams }} \
+--test-parameter download_streams=0 \
+-D {{ traffic_data_dir }}/flent -t 'upload {{ test_group_label }} {{ inventory_hostname }}'
+
+[ $? -ne 0 ] && echo "Upload test failed" && exit 3
+{% elif item == "download" %}
+{{ netdiag_venv }}/bin/flent {{ test_conf_name }} -l {{ duration }} \
+-H {{ server_targets|join(' -H ')|replace(host_prefix,'') }} \
+{{ '--socket-stats' if socket_stats else '' }} \
+--test-parameter upload_streams=0 \
+--test-parameter download_streams={{ download_streams }} \
+-D {{ traffic_data_dir }}/flent -t 'download {{ test_group_label }} {{ inventory_hostname }}'
+
+[ $? -ne 0 ] && echo "Download test failed" && exit 4
+{% endif %}
+exit 0

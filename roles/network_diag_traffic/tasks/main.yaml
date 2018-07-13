@@ -1,14 +1,7 @@
 ---
-- block:
 
-  - name: Prepare data directory
-    file: path="{{ traffic_data_dir }}" state=absent
-    become: True
-
-  - name: Prepare data directory
-    file: path="{{ traffic_data_dir }}" state=directory
-
-  when: pristine_traffic_data_dir
+- name: Prepare data directory
+  file: path="{{ traffic_data_dir }}/flent" state=directory
 
 - name: Default server targets
   set_fact:
@@ -20,36 +13,21 @@
     src: "{{ test_conf_src }}"
     dest: "{{ netdiag_venv}}/lib/python2.7/site-packages/flent/tests/{{ test_conf_name }}.conf"
 
-- block:
-
-  - name: "Run test duplex {{ test_group_label }}"
-    command: "{{ netdiag_venv}}/bin/flent {{ test_conf_name }}
-    -l {{ duration }}
-    -H {{ server_targets|join(' -H ')|replace('stfc-','') }}
-    {{ '--socket-stats' if socket_stats else '' }}
-    --test-parameter upload_streams={{ upload_streams }}
-    --test-parameter download_streams={{ download_streams }}
-    -D {{ traffic_data_dir }} -t 'duplex {{ test_group_label }} {{ inventory_hostname }}'"
+- name: Upload test wrapper script
+  template: src=flent.wrapper.sh.j2 dest="{{ netdiag_venv }}/bin/flent.{{ item }}.sh" mode=0755
+  with_items:
+    - "duplex"
+    - "upload"
+    - "download"
   
-  - name: "Run test upload {{ test_group_label }}"
-    command: "{{ netdiag_venv}}/bin/flent {{ test_conf_name }}
-    -l {{ duration }}
-    -H {{ server_targets|join(' -H ')|replace('stfc-','') }}
-    {{ '--socket-stats' if socket_stats else '' }}
-    --test-parameter upload_streams={{ upload_streams }}
-    --test-parameter download_streams=0
-    -D {{ traffic_data_dir }} -t 'upload {{ test_group_label }} {{ inventory_hostname }}'"
-  
-  - name: "Run test download {{ test_group_label }}"
-    command: "{{ netdiag_venv}}/bin/flent {{ test_conf_name }}
-    -l {{ duration }}
-    -H {{ server_targets|join(' -H ')|replace('stfc-','') }}
-    {{ '--socket-stats' if socket_stats else '' }}
-    --test-parameter upload_streams=0
-    --test-parameter download_streams={{ download_streams }}
-    -D {{ traffic_data_dir }} -t 'download {{ test_group_label }} {{ inventory_hostname }}'"
+- name: Execute test wrapper script (duplex)
+  shell: "{{ netdiag_venv }}/bin/flent.duplex.sh"
 
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/sbin"
+- name: Execute test wrapper script (upload)
+  shell: "{{ netdiag_venv }}/bin/flent.upload.sh"
 
+- name: Execute test wrapper script (download)
+  shell: "{{ netdiag_venv }}/bin/flent.download.sh"
 
+- name: Remove test wrapper script
+  shell: "rm -f {{ netdiag_venv }}/bin/flent.*.sh"
