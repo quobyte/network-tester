@@ -1,11 +1,11 @@
 ---
 - name: Remove any obsolete data
-  file: path="{{ traffic_data_dir }}/{{ test_group_label }}-stats" state=absent
+  file: path="{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}" state=absent
   become: True
   when: stat_phase is not defined or stat_phase == "before"
 
 - name: Ensure report directory exists
-  file: path="{{ traffic_data_dir }}/{{ test_group_label }}-stats" state=directory
+  file: path="{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}" state=directory
 
 - name: Gather statistics before the test
   shell: |
@@ -39,8 +39,10 @@
     ip ne &> arp.before.log
     exit 0
   args:
-    chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}"
     executable: /usr/bin/bash
+  environment:
+    PATH: '/usr/sbin:/usr/bin:{{ ansible_env.PATH }}'
   become: True
   when: stat_phase is not defined or stat_phase == "before"
 
@@ -60,21 +62,21 @@
     ip ne &> arp.after.log
     exit 0
   args:
-    chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}"
     executable: /usr/bin/bash
   become: True
   when: stat_phase is defined and stat_phase == "after"
 
 - name: Create report archive
   archive:
-    path: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    path: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}"
     dest: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ ansible_date_time.epoch }}-{{ inventory_hostname }}.tar.gz"
   become: True
   when: stat_phase is not defined or stat_phase == "after"
 
 - name: Remove temporary data
   file:
-    path: "{{ traffic_data_dir }}/{{ test_group_label }}-stats"
+    path: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}"
     state: absent
   become: True
   when: stat_phase is not defined or stat_phase == "after"

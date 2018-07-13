@@ -16,6 +16,16 @@
   tags:
     - install
 
+- name: Cleanup data dir
+  hosts: netdiag_hosts
+  gather_facts: no
+  roles:
+    - network_diag_cleanup
+  vars:
+    cleanup_mode: data_only
+  tags:
+    - test
+
 - name: Launch netperf servers
   hosts: netdiag_servers
   gather_facts: no
