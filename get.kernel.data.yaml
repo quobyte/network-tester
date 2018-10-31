@@ -1,0 +1,48 @@
+---
+- name: Cleanup data dir
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_cleanup
+  vars:
+    cleanup_mode: data_only
+  tags:
+    - test
+
+- name: Kernel statistics (before)
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    stat_phase: before
+  tags:
+    - test
+
+- name: Sleep for a while
+  gather_facts: no
+  hosts: localhost
+  tasks:
+    - pause: seconds="{{ stats_interval }}"
+  vars:
+    stats_interval: 60
+  tags:
+    - test
+
+- name: Kernel statistics (after)
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_kernel_stats
+  vars:
+    stat_phase: after
+  tags:
+    - test
+
+- name: Download stats
+  gather_facts: no
+  hosts: netdiag_hosts
+  roles:
+    - network_diag_download_data
+  tags:
+    - test
+
