@@ -54,7 +54,6 @@
 
 - name: Gather statistics after the test
   shell: |
-
     dmesg &> dmesg.after.log
     cat /proc/interrupts &> interrupts.after.log
     cat /proc/softirqs &> softirqs.after.log
