@@ -1,23 +1,43 @@
 ---
 - block:
-    - name: Install additional packages
+    - name: "Install additional packages (RedHat)"
       yum: name="{{ packages_to_install }}" state=latest
       become: True
 
-    - name: Copy netperf package
+    - name: "Copy netperf package (RedHat)"
       copy: src="{{ netperf_package }}" dest=/tmp
 
-    - name: Install netperf package
+    - name: "Install netperf package (RedHat)"
       yum:
         name: "/tmp/{{ netperf_package }}"
         state: present
       become: True
-  when: netperf_install
 
-- name: Remove netperf package
-  file: path="/tmp/{{ netperf_package }}" state=absent
+    - name: "Remove netperf package (RedHat)"
+      file: path="/tmp/{{ netperf_package }}" state=absent
+  when: netperf_install and ansible_os_family == "RedHat"
+
+- block:
+    - name: "Install dependencies (Debian)"
+      apt:
+        name: "{{ packages_to_install_debian }}"
+        state: latest
+        update_cache: yes
+      become: True
+
+    - name: "Install netperf package (Debian)"
+      apt:
+        name: netperf
+        state: latest
+        update_cache: yes
+      become: True
+      when: netperf_install
+  when: ansible_os_family == "Debian"
 
 - name: Install python packages in virtualenv
-  pip: name={{ item }} virtualenv={{ netdiag_venv }}
+  pip:
+    name: "{{ item }}"
+    virtualenv: "{{ netdiag_venv }}"
+    virtualenv_command: "{{ netdiag_venv_cmd }}"
   with_items:
     - flent

@@ -114,7 +114,7 @@ def iperf_start_servers(host_pairs, ssh_options, buf_len):
   servers = list()
   pids = list()
   for (host_name, target) in host_pairs:
-    servers.append((host_name, create_ssh_remote(host_name, ssh_options, 'echo $(iperf -D -s -N -l ' + str(buf_len) +' 2>&1 | grep ID | cut -d":" -f 2 | tr -d "\n" | tr -d " ")')))
+    servers.append((host_name, create_ssh_remote(host_name, ssh_options, 'iperf -D -s -N -l {} &> /dev/null; pgrep iperf'.format(buf_len))))
 
   time.sleep(2)
 
@@ -212,15 +212,22 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
 
   parser.add_argument('-H', '--hosts', type=argparse.FileType('r'), required=True)
-  parser.add_argument('-u', '--username', type=str, default="root")
+  parser.add_argument('-u', '--username', type=str)
   parser.add_argument('-i', '--identity', type=str)
+  parser.add_argument('-F', '--ssh-config', type=str)
 
   parsed = parser.parse_args()
 
-  sshopts = [ "-l", parsed.username ]
+  sshopts = []
+  if parsed.username is not None:
+    sshopts.append("-l")
+    sshopts.append(parsed.username)
   if parsed.identity is not None:
     sshopts.append("-i")
     sshopts.append(parsed.identity)
+  if parsed.ssh_config is not None:
+    sshopts.append("-F")
+    sshopts.append(parsed.ssh_config)
 
   hosts = parsed.hosts.read().splitlines()
   outputdir = "qbnettest-results-" + datetime.datetime.now().strftime('%Y%m%d%H%M%S')

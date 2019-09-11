@@ -182,8 +182,11 @@
 - name: Launch qbnettest
   gather_facts: no
   hosts: netdiag_hosts
-  roles:
-    - network_diag_qbnettest_traffic
+  tasks:
+    - name: Run additional tests
+      import_role:
+        name: network_diag_qbnettest_traffic
+      when: qbnettest_run
   tags:
     - test
 

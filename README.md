@@ -1,7 +1,7 @@
 # Network tester #
 
 
-This is a network tester playbook, which uses HP Netperf and Flent under the hood. The test is based on a mixed TCP/UDP/ICMP workload that is executed over three different client-server set configurations (1xM, Nx1, NxM). This software requires ansible >= 2.4 and python 2.7.
+This is a network tester playbook, which uses HP Netperf and Flent under the hood. The test is based on a mixed TCP/UDP/ICMP workload that is executed over three different client-server set configurations (1xM, Nx1, NxM). This software requires ansible >= 2.4 and python 3.6. The playbook has tested on the following OS platforms: RHEL/CentOS 7.x and Ubuntu 18.04.
 
 ## Preparations ##
 
@@ -18,6 +18,8 @@ $ ansible -i inventory_file -m ping -b all
 The command must produce no errors.
 
 The playbook includes a Netperf RPM package for RHEL/CentOS 7.x for your convenience. If you would like to provide your own binaries, bear in mind *--enable-demo* option must be supported by Netperf. In that case set `netperf_install: False`.
+
+Due to extensive use of sockets a user on behalf which tests are executed should be granted very high or unlimited file descriptor limits on target hosts.
 
 ## Test execution ##
 

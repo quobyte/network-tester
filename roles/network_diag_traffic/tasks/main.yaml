@@ -11,7 +11,7 @@
 - name: Upload test configuration
   copy:
     src: "{{ test_conf_src }}"
-    dest: "{{ netdiag_venv}}/lib/python2.7/site-packages/flent/tests/{{ test_conf_name }}.conf"
+    dest: "{{ netdiag_venv}}/lib/python3.6/site-packages/flent/tests/{{ test_conf_name }}.conf"
 
 - name: Upload test wrapper script
   template: src=flent.wrapper.sh.j2 dest="{{ netdiag_venv }}/bin/flent.{{ item }}.sh" mode=0755

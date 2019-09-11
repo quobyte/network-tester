@@ -19,3 +19,6 @@ pristine_local_traffic_data_dir: False
 # this prefix will be removed from inventory hostname when passing data to flent
 # useful when you've got different names for management and production interfaces
 host_prefix: ""
+
+# run additional network tests
+qbnettest_run: False

@@ -46,7 +46,7 @@
     exit 0
   args:
     chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}"
-    executable: /usr/bin/bash
+    executable: /bin/bash
   environment:
     PATH: '/usr/sbin:/usr/bin:{{ ansible_env.PATH }}'
   become: True
@@ -60,7 +60,7 @@
     cat /proc/net/softnet_stat &> softnet.after.log
     netstat -s &> netstat.after.log
     cat /proc/net/netstat &> netstat.raw.after.log
-    cat /proc/net/meminfo &> meminfo.after.log
+    cat /proc/meminfo &> meminfo.after.log
     cat /proc/buddyinfo &> buddyinfo.after.log
     cat /proc/pagetypeinfo &> pagetypeinfo.after.log
     cat /proc/zoneinfo &> zoneinfo.after.log
@@ -74,7 +74,7 @@
     exit 0
   args:
     chdir: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}"
-    executable: /usr/bin/bash
+    executable: /bin/bash
   become: True
   when: stat_phase is defined and stat_phase == "after"
 
