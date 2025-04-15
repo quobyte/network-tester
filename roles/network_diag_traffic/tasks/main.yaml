@@ -8,10 +8,10 @@
     server_targets: "{{ groups['netdiag_servers'] }}"
   when: server_targets is not defined
 
-- name: Upload test configuration
+- name: Upload test configuration (Python {{ ansible_python_version }})
   copy:
     src: "{{ test_conf_src }}"
-    dest: "{{ netdiag_venv}}/lib/python3.6/site-packages/flent/tests/{{ test_conf_name }}.conf"
+    dest: "{{ netdiag_venv}}/lib/python{{ ansible_python_version.rsplit('.', 1)[0] }}/site-packages/flent/tests/{{ test_conf_name }}.conf"
 
 - name: Upload test wrapper script
   template: src=flent.wrapper.sh.j2 dest="{{ netdiag_venv }}/bin/flent.{{ item }}.sh" mode=0755

@@ -8,7 +8,7 @@
 #ansible_ssh_common_args: some_ssh_opts
 
 # If you want to provide your own netperf binary set to False
-netperf_install: True
+netperf_install: False
 
 # Path on an ansible host where test data fetched from clients and servers is stored
 local_traffic_data_dir: /tmp/quobyte_netdiag_data

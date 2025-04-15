@@ -1,4 +1,14 @@
 ---
+packages_to_install_rh_9:
+  - iproute
+  - iperf
+  - ethtool
+  - pciutils
+  - procps-ng
+  - netperf
+  - python3-virtualenv
+  - python3-setuptools
+
 packages_to_install:
   - python36
   - python-virtualenv
@@ -19,5 +29,5 @@ packages_to_install_debian:
 netperf_package: netperf-2.7.0-1.el7.x86_64.rpm
 netdiag_venv: /var/tmp/netdiag_venv
 # netdiag_venv_cmd: virtualenv
-netdiag_venv_cmd: "/usr/bin/python3.6 -m venv"
+netdiag_venv_cmd: "/usr/bin/python3 -m venv"
 netperf_install: True

@@ -79,7 +79,7 @@
   when: stat_phase is defined and stat_phase == "after"
 
 - name: Create report archive
-  archive:
+  community.general.archive:
     path: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ inventory_hostname }}"
     dest: "{{ traffic_data_dir }}/{{ test_group_label }}-stats-{{ ansible_date_time.epoch }}-{{ inventory_hostname }}.tar.gz"
   become: True

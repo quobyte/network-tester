@@ -1,21 +1,38 @@
 ---
 - block:
-    - name: "Install additional packages (RedHat)"
+    - name: Add EPEL repository (RedHat / Rocky 9)
+      ansible.builtin.dnf:
+          name: epel-release
+          state: present
+      become: True
+    - name: Add CRB repository (RedHat / Rocky 9)
+      community.general.dnf_config_manager:
+          name: crb
+          state: enabled
+      become: True
+    - name: "Install additional packages (RedHat / Rocky 9), including netperf"
+      yum: name="{{ packages_to_install_rh_9 }}" state=latest
+      become: True
+
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == "9"
+
+- block:
+    - name: "Install additional packages (RedHat 7)"
       yum: name="{{ packages_to_install }}" state=latest
       become: True
 
-    - name: "Copy netperf package (RedHat)"
+    - name: "Copy netperf package (RedHat 7)"
       copy: src="{{ netperf_package }}" dest=/tmp
 
-    - name: "Install netperf package (RedHat)"
+    - name: "Install netperf package (RedHat 7)"
       yum:
         name: "/tmp/{{ netperf_package }}"
         state: present
       become: True
 
-    - name: "Remove netperf package (RedHat)"
+    - name: "Remove netperf package (RedHat 7)"
       file: path="/tmp/{{ netperf_package }}" state=absent
-  when: netperf_install and ansible_os_family == "RedHat"
+  when: netperf_install and ansible_os_family == "RedHat" and ansible_distribution_version == "7"
 
 - block:
     - name: "Install dependencies (Debian)"
