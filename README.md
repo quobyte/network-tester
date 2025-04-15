@@ -20,6 +20,8 @@ Before you run the test make sure you can access all hosts via SSH. The user nee
 We recommend using SSH keys for authentication, although passwords also can be used. You may rely on your current SSH client configuration or provide authentication data explicitly in the file `group_vars/netdiag_hosts.yaml`. Refer to [Ansible documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#list-of-behavioral-inventory-parameters) for further information. Log in once to each host to add hosts to trusted
 hosts.
 
+Make sure that the firewall configuration of all hosts allows pings and TCP connections on ports in the range of 5000-65536.
+
 Host are divided into two sets: clients and servers. The sets may overlap, but since this playbook is about network testing disjoint set configuration is recommended. Populate inventory file accordingly. For a typical Quobyte installation, you would run tests between actual client and server machines, and second test between one half of the servers as clients, and the other half as servers.
 
 To verify configuration is correct run the following:
