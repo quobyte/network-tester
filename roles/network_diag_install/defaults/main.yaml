@@ -25,6 +25,7 @@ packages_to_install_debian:
   - ethtool
   - pciutils
   - procps
+  - netperf
 
 netperf_package: netperf-2.7.0-1.el7.x86_64.rpm
 netdiag_venv: /var/tmp/netdiag_venv
